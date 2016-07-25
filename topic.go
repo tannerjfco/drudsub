@@ -4,9 +4,14 @@ import "google.golang.org/cloud/pubsub"
 
 // Topic is a drudsub topic to interact with.
 type Topic struct {
-	Name       string
+	// The topic name.
+	Name string
+
+	// A connection struct.
 	Connection Connection
-	Topic      *pubsub.Topic
+
+	// The pubsub topic -- should only be used internally.
+	Topic *pubsub.Topic
 }
 
 // Create a topic.

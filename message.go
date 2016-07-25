@@ -4,5 +4,4 @@ package drudsub
 type Message struct {
 	Data       []byte
 	Attributes map[string]string
-	Connection Connection
 }

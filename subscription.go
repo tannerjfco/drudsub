@@ -80,7 +80,6 @@ func (s Subscription) read() error {
 				s.Channel <- Message{
 					Data:       msg.Data,
 					Attributes: msg.Attributes,
-					Connection: s.Connection,
 				}
 			}
 		}
