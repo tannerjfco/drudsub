@@ -15,7 +15,7 @@ type Topic struct {
 }
 
 // Create a topic.
-func (t Topic) Create() error {
+func (t *Topic) Create() error {
 	// get topic, create it if it does not exist
 	exists, err := pubsub.TopicExists(t.Connection.Context, t.Name)
 	if err != nil {
@@ -35,7 +35,7 @@ func (t Topic) Create() error {
 }
 
 // Publish messages to a topic.
-func (t Topic) Publish(m []Message) ([]string, error) {
+func (t *Topic) Publish(m []Message) ([]string, error) {
 	var messages []*pubsub.Message
 
 	for _, v := range m {

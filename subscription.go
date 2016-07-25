@@ -29,7 +29,7 @@ type Subscription struct {
 }
 
 // Subscribe to a topic.
-func (s Subscription) Subscribe(topic string, create bool) (<-chan Message, error) {
+func (s *Subscription) Subscribe(create bool) (<-chan Message, error) {
 	if create {
 		s.Topic.Create()
 	}
@@ -48,10 +48,11 @@ func (s Subscription) Subscribe(topic string, create bool) (<-chan Message, erro
 		}
 	}
 
+	go s.read()
 	return s.Channel, nil
 }
 
-func (s Subscription) read() error {
+func (s *Subscription) read() error {
 	// Pull() returns an iterator which handles requesting of messages in the background
 	it, err := s.Subscription.Pull(s.Connection.Context)
 	if err != nil {
@@ -87,7 +88,7 @@ func (s Subscription) read() error {
 }
 
 // Create a new subscription
-func (s Subscription) Create() error {
+func (s *Subscription) Create() error {
 	exists, err := pubsub.SubExists(s.Connection.Context, s.Name)
 	if err != nil {
 		return err

@@ -24,7 +24,7 @@ type Connection struct {
 }
 
 // Connect to drudsub backing service.
-func (c Connection) Connect() error {
+func (c *Connection) Connect() error {
 	// read contents of jwt file
 	jbytes, err := ioutil.ReadFile(jwtPath)
 	if err != nil {
@@ -39,10 +39,10 @@ func (c Connection) Connect() error {
 	if err != nil {
 		return err
 	}
-
 	// create a google cloud context
 	c.Context = cloud.NewContext(projectID, conf.Client(oauth2.NoContext))
 	// instantiate a client for workign with pub sub
 	c.Client, err = pubsub.NewClient(c.Context, projectID, cloud.WithTokenSource(conf.TokenSource(c.Context)))
+
 	return err
 }
