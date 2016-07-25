@@ -1,15 +1,10 @@
 package drudsub
 
-import (
-	"log"
-
-	"google.golang.org/cloud/pubsub"
-)
+import "google.golang.org/cloud/pubsub"
 
 // Topic is a drudsub topic to interact with.
 type Topic struct {
 	Name       string
-	Channel    chan Message
 	Connection Connection
 	Topic      *pubsub.Topic
 }
@@ -27,9 +22,22 @@ func (t Topic) Create() error {
 	} else {
 		t.Topic, err = t.Connection.Client.NewTopic(t.Connection.Context, t.Name)
 		if err != nil {
-			log.Fatalln(err)
+			return err
 		}
 	}
 
 	return nil
+}
+
+// Publish messages to a topic.
+func (t Topic) Publish(m []Message) ([]string, error) {
+	var messages []*pubsub.Message
+
+	for _, v := range m {
+		messages = append(messages, &pubsub.Message{
+			Data:       v.Data,
+			Attributes: v.Attributes,
+		})
+	}
+	return t.Topic.Publish(t.Connection.Context, messages...)
 }

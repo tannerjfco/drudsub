@@ -6,8 +6,3 @@ type Message struct {
 	Attributes map[string]string
 	Connection Connection
 }
-
-// Send a message to a topic.
-func (m Message) Send(t Topic) error {
-	return nil
-}

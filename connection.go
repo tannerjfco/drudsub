@@ -2,6 +2,7 @@ package drudsub
 
 import (
 	"io/ioutil"
+	"os"
 
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
@@ -10,14 +11,15 @@ import (
 	"google.golang.org/cloud/pubsub"
 )
 
-const (
-	projectID = "ecorson-drud"
-	jwtPath   = "/Users/frodopwns/ecorson-testing.json"
-)
+var projectID = os.Getenv("DRUDSUB_PROJECT")
+var jwtPath = os.Getenv("DRUDSUB_JWT")
 
 // Connection to pubsub/nats
 type Connection struct {
-	Client  *pubsub.Client
+	// The pubsub connection client.
+	Client *pubsub.Client
+
+	// The pubsub context.
 	Context context.Context
 }
 
