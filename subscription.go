@@ -19,15 +19,15 @@ func (s Subscription) Subscribe(topic string, create bool) (<-chan Message, erro
 		s.Topic.Create()
 	}
 
-	exists, err := pubsub.SubExists(s.Topic.Context, s.Name)
+	exists, err := pubsub.SubExists(s.Connection.Context, s.Name)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	if exists {
-		s.Subscription = s.Topic.Client.Subscription(s.Name)
+		s.Subscription = s.Connection.Client.Subscription(s.Name)
 	} else {
-		s.Subscription, err = s.Topic.Client.NewSubscription(s.Topic.Context, s.Name, s.Topic.Topic, 0, nil)
+		s.Subscription, err = s.Connection.Client.NewSubscription(s.Connection.Context, s.Name, s.Topic.Topic, 0, nil)
 		if err != nil {
 			log.Fatalln(err)
 		}
