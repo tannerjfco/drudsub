@@ -22,14 +22,14 @@ type Subscription struct {
 	Connection Connection
 
 	// Channel from which to receive subscription messages.
-	Channel chan Message
+	Channel chan *Message
 
 	// The ticker duration for the message channel. Will default to 5 seconds.
 	tickInterval time.Duration
 }
 
 // Subscribe to a topic.
-func (s *Subscription) Subscribe(create bool) (<-chan Message, error) {
+func (s *Subscription) Subscribe(create bool) (<-chan *Message, error) {
 	if create {
 		s.Topic.Create()
 	}
@@ -47,7 +47,7 @@ func (s *Subscription) Subscribe(create bool) (<-chan Message, error) {
 			return s.Channel, err
 		}
 	}
-
+	s.Channel = make(chan *Message)
 	go s.read()
 	return s.Channel, nil
 }
@@ -55,6 +55,7 @@ func (s *Subscription) Subscribe(create bool) (<-chan Message, error) {
 func (s *Subscription) read() error {
 	// Pull() returns an iterator which handles requesting of messages in the background
 	it, err := s.Subscription.Pull(s.Connection.Context)
+	log.Println("Reading!")
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -68,20 +69,20 @@ func (s *Subscription) read() error {
 	for {
 		select {
 		case <-ticker:
-			if err == pubsub.Done {
-				msg, err := it.Next()
-				if err == pubsub.Done {
-					s.Channel = nil
-					return nil
-				}
-				if err != nil {
-					return err
-				}
+			log.Println("Ticking!")
+			msg, err := it.Next()
+			log.Printf("%v\n", msg)
+			if err != nil && err != pubsub.Done {
+				return err
+			}
 
-				s.Channel <- Message{
-					Data:       msg.Data,
-					Attributes: msg.Attributes,
-				}
+			// Confirm receipt of message.
+			msg.Done(true)
+
+			// Send message back to channel.
+			s.Channel <- &Message{
+				Data:       msg.Data,
+				Attributes: msg.Attributes,
 			}
 		}
 	}
