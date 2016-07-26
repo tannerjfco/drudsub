@@ -29,7 +29,6 @@ type Connection struct {
 
 // GetJWTByes returns jwt from file or vault
 func GetJWTByes() (jbytes []byte, err error) {
-
 	if jwtPath != "" {
 		// read contents of jwt file
 		jbytes, err = ioutil.ReadFile(jwtPath)
