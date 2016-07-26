@@ -4,10 +4,10 @@
 ### Required environment variables
 
 <dl>
-<dd>The path to a JWT</dd>
-<dt>export DRUDSUB_JWT="/path/to/jwt.json"</dt>
-<dd>The google cloud project name</dd>
-<dt>export DRUDSUB_PROJECT="bbowman-drud"</dt>
+<dt>The path to a JWT</dt>
+<dd>export DRUDSUB_JWT="/path/to/jwt.json"</dd>
+<dt>The google cloud project name</dt>
+<dd>export DRUDSUB_PROJECT="bbowman-drud"</dd>
 </dl>
 
 ### Example implementation code.
