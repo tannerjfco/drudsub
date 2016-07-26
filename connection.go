@@ -4,6 +4,8 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/drud/drud-go/secrets"
+
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
@@ -13,6 +15,8 @@ import (
 
 var projectID = os.Getenv("DRUDSUB_PROJECT")
 var jwtPath = os.Getenv("DRUDSUB_JWT")
+var gitToken = os.Getenv("GITHUB_TOKEN")
+var vaultHost = os.Getenv("VAULT_ADDR")
 
 // Connection to pubsub/nats
 type Connection struct {
@@ -23,13 +27,26 @@ type Connection struct {
 	Context context.Context
 }
 
+// GetJWTByes returns jwt from file or vault
+func GetJWTByes() (jbytes []byte, err error) {
+	if jwtPath != "" {
+		// read contents of jwt file
+		jbytes, err = ioutil.ReadFile(jwtPath)
+	} else if gitToken != "" {
+		// get jwt from vault
+		jbytes, err = secrets.GetJWT(gitToken, vaultHost, projectID)
+	}
+	return
+}
+
 // Connect to drudsub backing service.
 func (c *Connection) Connect() error {
-	// read contents of jwt file
-	jbytes, err := ioutil.ReadFile(jwtPath)
+	// read contents of jwt file or use vault
+	jbytes, err := GetJWTByes()
 	if err != nil {
 		return err
 	}
+
 	// instantiate google conf using jwt contents
 	conf, err := google.JWTConfigFromJSON(
 		jbytes,
