@@ -28,23 +28,16 @@ type Connection struct {
 }
 
 // GetJWTByes returns jwt from file or vault
-func GetJWTByes() ([]byte, error) {
-	var jbytes []byte
-	var err error
+func GetJWTByes() (jbytes []byte, err error) {
+
 	if jwtPath != "" {
 		// read contents of jwt file
 		jbytes, err = ioutil.ReadFile(jwtPath)
-		if err != nil {
-			return nil, err
-		}
 	} else if gitToken != "" {
 		// get jwt from vault
 		jbytes, err = secrets.GetJWT(gitToken, vaultHost, projectID)
-		if err != nil {
-			return nil, err
-		}
 	}
-	return jbytes, err
+	return
 }
 
 // Connect to drudsub backing service.
