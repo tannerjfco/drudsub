@@ -1,6 +1,7 @@
 package drudsub
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"os"
 
@@ -13,7 +14,7 @@ import (
 	"google.golang.org/cloud/pubsub"
 )
 
-var projectID = os.Getenv("DRUDSUB_PROJECT")
+var project = os.Getenv("DRUDSUB_PROJECT")
 var jwtPath = os.Getenv("DRUDSUB_JWT")
 var gitToken = os.Getenv("GITHUB_TOKEN")
 var vaultHost = os.Getenv("VAULT_ADDR")
@@ -27,6 +28,10 @@ type Connection struct {
 	Context context.Context
 }
 
+type JWT struct {
+	ProjectID string `json:"project_id"`
+}
+
 // GetJWTByes returns jwt from file or vault
 func GetJWTByes() (jbytes []byte, err error) {
 	if jwtPath != "" {
@@ -34,7 +39,7 @@ func GetJWTByes() (jbytes []byte, err error) {
 		jbytes, err = ioutil.ReadFile(jwtPath)
 	} else if gitToken != "" {
 		// get jwt from vault
-		jbytes, err = secrets.GetJWT(gitToken, vaultHost, projectID)
+		jbytes, err = secrets.GetJWT(gitToken, vaultHost, project)
 	}
 	return
 }
@@ -43,6 +48,13 @@ func GetJWTByes() (jbytes []byte, err error) {
 func (c *Connection) Connect() error {
 	// read contents of jwt file or use vault
 	jbytes, err := GetJWTByes()
+	if err != nil {
+		return err
+	}
+
+	// get the project id from the jwt
+	jwtStruct := JWT{}
+	err = json.Unmarshal(jbytes, &jwtStruct)
 	if err != nil {
 		return err
 	}
@@ -56,10 +68,11 @@ func (c *Connection) Connect() error {
 	if err != nil {
 		return err
 	}
+
 	// create a google cloud context
-	c.Context = cloud.NewContext(projectID, conf.Client(oauth2.NoContext))
+	c.Context = cloud.NewContext(jwtStruct.ProjectID, conf.Client(oauth2.NoContext))
 	// instantiate a client for workign with pub sub
-	c.Client, err = pubsub.NewClient(c.Context, projectID, cloud.WithTokenSource(conf.TokenSource(c.Context)))
+	c.Client, err = pubsub.NewClient(c.Context, jwtStruct.ProjectID, cloud.WithTokenSource(conf.TokenSource(c.Context)))
 
 	return err
 }
