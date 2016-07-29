@@ -1,0 +1,20 @@
+package: github.com/drud/drudsub
+import:
+- package: golang.org/x/net
+  vcs: git
+  repo: git@github.com:golang/net.git
+  version: 6a513affb38dc9788b449d59ffed099b8de18fa0
+  subpackages:
+  - context
+- package: golang.org/x/oauth2
+  vcs: git
+  repo: git@github.com:golang/oauth2.git
+  version: 1364adb2c63445016c5ed4518fc71f6a3cda6169
+  subpackages:
+  - google
+- package: google.golang.org/cloud
+  vcs: git
+  repo: git@github.com:GoogleCloudPlatform/gcloud-golang.git
+  version: 1da7ac3d5f2b6a48521b20a6ed80569f506b87ce
+  subpackages:
+  - pubsub
