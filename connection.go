@@ -28,6 +28,7 @@ type Connection struct {
 	Context context.Context
 }
 
+// JWT content struct.
 type JWT struct {
 	ProjectID string `json:"project_id"`
 }
